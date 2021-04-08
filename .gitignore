@@ -1,1 +1,4 @@
 token.txt
+connection_url.txt
+__pycache__/
+*.pyc

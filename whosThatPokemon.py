@@ -1,8 +1,9 @@
 import random
 import pokeInfo as info
 import request as r
+import databaseConnection as db
 
-async def quiz(ctx, client):
+async def quiz(ctx, client, cluster):
     pokeID = random.randint(1, 893)
     await ctx.channel.send("Who's this pokemon?")
     pokemon = await info.show_poke(ctx, pokeID, show_name=False)
@@ -15,5 +16,6 @@ async def quiz(ctx, client):
     try:
         msg = await client.wait_for('message', check=check, timeout=6.0)
         await ctx.channel.send('Correct {.name}!'.format(msg.author))
+        await db.givePoints(ctx, cluster)
     except:
         await ctx.channel.send('The answer was {}!'.format(pokemon_name))
