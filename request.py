@@ -16,8 +16,6 @@ def check_status(url):
     return True
 
 async def getPokemon(ctx, pokeID):
-    print("_________")
-    print(pokeID)
     url = "https://pokeapi.co/api/v2/pokemon/" + str(pokeID)
     print(url)
     if not check_status(url):
@@ -25,7 +23,6 @@ async def getPokemon(ctx, pokeID):
         return -1
 
     pokemon = requests.get(url).json()
-    print(pokemon)
     return pokemon
 
     # await ctx.channel.send(pokemon["name"])

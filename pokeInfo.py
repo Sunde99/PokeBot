@@ -19,12 +19,10 @@ def pokemon_types(pokemon):
 
 
 async def show_poke(ctx, pokeID, show_name=True, show_type=True):
-    print("HERE ENTERS SHOW_POKE")
-    print(pokeID)
     pokemon = await r.getPokemon(ctx, pokeID)
     if pokemon == -1: return
-    print(pokemon)
-    await embed(pokemon, ctx)
+    await embed(pokemon, ctx, show_name, show_type)
+    return pokemon
 
 
 async def embed(pokemon, ctx, show_name=True, show_type=True):
@@ -34,7 +32,6 @@ async def embed(pokemon, ctx, show_name=True, show_type=True):
         pokemon ([Json]): [A dict of the pokemon]
         ctx ([context]): [Used to send the embed]
     """
-    print("HERE ENTERS EMBED")
     pokemon_name = pokemon["name"]
     pokemon_url = "https://bulbapedia.bulbagarden.net/wiki/" + pokemon_name + "(Pok%C3%A9mon)"
     pokemon_description = pokemon_types(pokemon)

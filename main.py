@@ -25,7 +25,7 @@ async def on_message(ctx):
     print(message)
 
     if await mode(message) == "quiz":
-        await who.quiz(ctx)
+        await who.quiz(ctx, client)
     else:
         pokemon = message.split(" ", 1)[1]
         await info.show_poke(ctx, pokemon)
