@@ -45,7 +45,15 @@ async def showPoints(ctx, cluster):
     """
     points = await pointsDB(await getDB(cluster))
 
-    currentPoints = points.find({}, {'_id': 0})
+    currentPoints = points.find({}, {'_id': 1, 'score': 1})
     for data in currentPoints:
+        if (data["_id"] != ctx.author.id): continue
+        print("----ID")
+        print(ctx.author.id)
+        print(data["_id"])
         score = data["score"]
         await ctx.channel.send(f"{ctx.author.name} has {score} points")
+
+async def resetPoints(ctx, cluster):
+    points = await pointsDB(await getDB(cluster))
+    points.update_one({"_id":ctx.author.id}, {"$set":{"score":0}})
