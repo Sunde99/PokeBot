@@ -87,8 +87,6 @@ async def on_message(ctx):
     message = ctx.content
 
     if not message.lower().startswith("pokemon "):
-        if (random.randint(0,5) > 2):
-            await parser(ctx, "catch", message)
         return
     print(message)
 
