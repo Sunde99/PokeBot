@@ -6,7 +6,8 @@ import databaseConnection as db
 async def quiz(ctx, client, cluster):
     pokeID = random.randint(1, 893)
     await ctx.channel.send("Who's this pokemon?")
-    pokemon = await info.show_poke(ctx, pokeID, show_name=False)
+    pokemon = await info.get_poke(ctx, pokeID)
+    await info.show_poke(ctx, pokeID, show_name=False)
     
     pokemon_name = pokemon["name"]
 
