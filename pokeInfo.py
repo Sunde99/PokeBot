@@ -17,12 +17,13 @@ def pokemon_types(pokemon):
     return "[" + types[0]["type"]["name"] + "]" if (len(types) == 1) \
         else "[" + types[0]["type"]["name"] + ", " + types[1]["type"]["name"] + "]"
 
+async def get_poke(ctx, pokeID):
+    return await r.getPokemon(ctx, pokeID)
 
 async def show_poke(ctx, pokeID, show_name=True, show_type=True):
     pokemon = await r.getPokemon(ctx, pokeID)
     if pokemon == -1: return
     await embed(pokemon, ctx, show_name, show_type)
-    return pokemon
 
 
 async def embed(pokemon, ctx, show_name=True, show_type=True):
