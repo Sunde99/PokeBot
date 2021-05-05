@@ -1,29 +1,34 @@
 import random
-import pokeInfo as info
+import utility
 import databaseConnection as db
 
-async def spawnPoke(ctx, client, cluster):
-    pokeID = random.randint(1, 893)
-    await ctx.channel.send("Catch this")
+class PokemonSpawner:
 
-    await info.show_poke(ctx, pokeID, show_name=False, show_type=False)
-    pokemon = await info.get_poke(ctx, pokeID)
-    pokemon_name = pokemon["name"]
-    await catch(ctx, client, cluster, pokemon_name) #TODO move this out
+    def __init__(self, ctx, client, cluster):
+        self.pokeID = random.randint(1,893)
+        self.IVs = [random.randrange(0, 32, 1) for i in range(6)]
+        self.ctx = ctx
+        self.client = client
+        self.cluster = cluster
+        self.pokemon = {}
+        self.pokemon_name = ""
 
+    async def spawnPoke(self):
+        await self.ctx.channel.send("Catch this!")
+        await utility.show_poke(self.ctx, self.pokeID, show_name=False, show_type=False)
+        self.pokemon = await utility.get_poke(self.ctx, self.pokeID)
+        self.pokemon_name = self.pokemon["name"]
 
-async def catch(ctx, client, cluster, pokemon_name):
-    IVs = [random.randrange(0, 32, 1) for i in range(6)]
-    def check(m):
-        return m.content.lower() == pokemon_name.lower() and m.channel == ctx.channel
+    async def catch(self):
+        def check(m):
+            return m.content.lower() == self.pokemon_name.lower() and m.channel == self.ctx.channel
 
-    try:
-        msg = await client.wait_for('message', check=check, timeout=10.0)
-        await ctx.channel.send('Correct {.name}!'.format(msg.author))
-        await savePokemonToDB(ctx, pokemon_name, IVs, cluster)
-    except:
-        await ctx.channel.send('{} ran away...'.format(pokemon_name))
+        try:
+            msg = await self.client.wait_for('message', check=check, timeout=10.0)
+            await self.ctx.channel.send('Correct {.name}!'.format(msg.author))
+            print("Saving")
+            await db.catchPokemon(msg, self.pokemon_name, self.IVs, self.cluster)
+            print("Saved")
+        except:
+            await self.ctx.channel.send('{} ran away...'.format(self.pokemon_name))
 
-async def savePokemonToDB(ctx, pokemon, IVs, cluster):
-    print("saving")
-    await db.catchPokemon(ctx, pokemon, IVs, cluster)
