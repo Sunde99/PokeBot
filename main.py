@@ -8,6 +8,8 @@ from pymongo import MongoClient
 import databaseConnection as db
 import utility
 import items
+import request
+import abilities
 import whosThatPokemon as who
 import spawnPokemon as spawn
 
@@ -22,7 +24,7 @@ client = discord.Client()
 async def mode(msg):
     return msg.split()[1].lower()
 
-async def parser(ctx, command, message):
+async def parser(ctx, command, message): # TODO message has command as its first element, FIX!
     if command == "quiz":
         quiz = who.QuizGame(client, pokebotCluster)
         await quiz.quiz(ctx)
@@ -30,23 +32,7 @@ async def parser(ctx, command, message):
     elif command == "points":
         await db.showPoints(ctx, pokebotCluster)
     elif command == "reset":
-
-        def areYouSure(m):
-            print(m.content)
-            return m.author == ctx.author and m.channel == ctx.channel and (m.content.lower() == "y" or m.content.lower() == "n")
-
-        await ctx.channel.send("Are you sure you want to reset your points? y/n")
-
-        try:
-            msg = await client.wait_for('message', check=areYouSure, timeout=8.0)
-            print(msg.content)
-            
-            if (msg.content == "y"): 
-                await db.resetPoints(ctx, pokebotCluster)
-                await ctx.channel.send("{.name}'s points have been reset".format(msg.author))
-            else: await ctx.channel.send("{.name}'s points have not been reset".format(msg.author))
-        except:
-            await ctx.channel.send("Your points did not get reset")
+        await db.resetPoints(ctx, pokebotCluster, client)
     elif command == "catch":
         spawner = spawn.PokemonSpawner(ctx, client, pokebotCluster)
         await spawner.spawnPoke()
@@ -58,12 +44,28 @@ async def parser(ctx, command, message):
     elif command == "timer-off":
         timer.randomSpawns = False
     elif command == "item":
-        print("here:" + message)
         if (len(message.split()) > 3): item = message.split(" ", 2)
         else: item = message.split()
-        print(item)
-        print(item[2])
-        await items.item(ctx, item[2])
+        if (len(item) <= 2): await ctx.channel.send("You need to give me an item to check!")
+        else: await items.item(ctx, item[2])
+
+    elif command == "ability":
+        if (len(message.split()) > 3): poke_ability = message.split(" ", 2)
+        else: poke_ability = message.split()
+
+        ability_checker = abilities.Ability(ctx)
+        if (await ability_checker.is_this_ability(poke_ability[2])):
+            print(poke_ability[2] + "<----")
+            await ability_checker.ability_lookup(poke_ability[2])
+        else:
+            await ability_checker.possible_abilities()
+
+        await ability_checker.ability_show()
+
+
+        # if (len(ability) <= 2): await ctx.channel.send("You need to give me an ability to check!")
+        # else: await abilities.ability_show(ctx, ability[2], await abilities.ability_lookup(ctx, ability[2]))
+
     else:
         pokemon = message.split(" ", 1)[1]
         await utility.show_poke(ctx, pokemon)
