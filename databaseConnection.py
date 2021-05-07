@@ -52,9 +52,32 @@ async def showPoints(ctx, cluster):
         score = data["score"]
         await ctx.channel.send(f"{ctx.author.name} has {score} points")
 
-async def resetPoints(ctx, cluster):
-    db = await pointsDB(cluster)
-    db.update_one({"_id":ctx.author.id}, {"$set":{"score":0}})
+async def resetPoints(ctx, cluster, client):
+    def areYouSure(m):
+        print("L1")
+        print(m.content)
+        print("L2")
+        print(m.author.name)
+        return m.author == ctx.author and m.channel == ctx.channel and (m.content.lower() == "y" or m.content.lower() == "n")
+
+    await ctx.channel.send("Are you sure you want to reset your points? y/n")
+
+    try:
+        print("This should run")
+        msg = await client.wait_for('message', check=areYouSure, timeout=8.0)
+        print(msg.content)
+        
+            
+        if (msg.content == "y"): 
+            db = await pointsDB(cluster)
+            db.update_one({"_id":ctx.author.id}, {"$set":{"score":0}})
+            await ctx.channel.send("{.name}'s points have been reset".format(msg.author))
+        else: 
+            await ctx.channel.send("{.name}'s points have not been reset".format(msg.author))
+    except:
+        await ctx.channel.send("Your points did not get reset")
+
+    
 
 async def catchPokemon(ctx, pokemon, IVs, cluster):
     db = await pokemonDB(cluster)
