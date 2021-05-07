@@ -44,3 +44,12 @@ async def getPokemon(ctx, pokeID):
     return pokemon
 
     # await ctx.channel.send(pokemon["name"])
+
+async def getAbility(ctx, ability):
+    url = "https://pokeapi.co/api/v2/ability/" + ability
+    if not check_status(url):
+        await ctx.channel.send("something went wrong")
+        return -1
+
+    return requests.get(url).json()
+
