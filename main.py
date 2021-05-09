@@ -99,7 +99,7 @@ async def on_message(ctx):
 
     message = ctx.content
 
-    if not message.lower().startswith("pokemon "):
+    if not message.lower().startswith("!p "):
         return
     print(message)
 
